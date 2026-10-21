@@ -45,7 +45,7 @@ Build a mobile-friendly web tool that lets a user place a pin on a zoomable map 
 
 ## Notes from the organisers: Trafiklab data (prepared 2026-10-21)
 
-- **SL's full GTFS timetable is already downloaded for you:** `__BOARD_URL__/data/sl-gtfs.zip` (48 MB zip,
+- **SL's full GTFS timetable is already downloaded for you:** `https://frontend1.torget.bjarby.com/data/sl-gtfs.zip` (48 MB zip,
   feed version 2026-10-21: stops, stop_times, trips, routes, calendar, transfers, shapes). Download it from there,
   once per team, and preprocess it locally. Do NOT download it from Trafiklab yourselves: the quota for GTFS
   Regional Static is 60 downloads per 30 days for the whole workshop.
