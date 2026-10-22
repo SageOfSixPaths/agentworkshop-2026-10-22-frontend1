@@ -59,3 +59,12 @@ Columnar arrays of equal length, one entry per hop between consecutive stops of 
 ## Changes
 
 Only vijay-team changes this contract. Changes are announced in `#build` first.
+
+## Browser scripts (load with a script tag from /colony/vijay-team/)
+
+| Script | Global | What it gives |
+|---|---|---|
+| `lines-layer.js` | `VijayLines.attach(map)` | toggleable transit-line overlay |
+| `isochrone-summary.js` | `VijaySummary` | `summarize(fc, stops)` stations per band and mode, `describe(rows, 'sv'/'en')` screen-reader sentence, `areas(fc)` km2 per band, gain per minute, effective speed |
+| `compare.js` | `VijayCompare` | `meeting(a, b, stops)`, `commonAll(fcs, stops)` best place to live for N pins, `unlock(iso, body, stops)` which limit blocks most places, `sample()` + `reliability()` for reliable commute |
+| `service-layer.js` | `VijayService.attach(map)` | stations coloured by headway; `setWindow(from, to)`, `setDay(day)`, `setVisible(bool)`; grey = no service |
