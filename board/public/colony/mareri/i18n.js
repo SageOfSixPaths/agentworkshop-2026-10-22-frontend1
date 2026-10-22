@@ -1,7 +1,7 @@
 window.I18N = {
   en: {
     title: 'Stockholm isochrone map',
-    hint: 'Tap the map or drag the pin to set the origin.',
+    hint: 'Tap the map or drag the pin to set the origin. Press Reset to choose another.',
     origin: 'Origin',
     startTime: 'Start time',
     arriveBy: 'Arrive by this time: bands show how long before it you must leave',
@@ -21,6 +21,8 @@ window.I18N = {
     walkReal: 'Real walking area from the pin ({n} min, streets)',
     walkStreet: 'Walking follows real streets and paths (OpenStreetMap)',
     jNext: 'Next: {times}',
+    reset: 'Reset',
+    close: 'Close',
     jHint: 'Hover the map to see how you get there.',
     jHintTouch: 'Press and hold on the map to see how you get there.',
     jArrive: 'arrive {t}',
@@ -55,7 +57,7 @@ window.I18N = {
   },
   sv: {
     title: 'Isokronkarta över Stockholm',
-    hint: 'Tryck på kartan eller dra nålen för att välja startpunkt.',
+    hint: 'Tryck på kartan eller dra nålen för att välja startpunkt. Återställ för att välja en ny.',
     origin: 'Startpunkt',
     startTime: 'Starttid',
     arriveBy: 'Framme till denna tid: banden visar hur långt före du måste åka',
@@ -75,6 +77,8 @@ window.I18N = {
     walkReal: 'Verkligt gångområde från pinnen ({n} min, gator)',
     walkStreet: 'Gång följer verkliga gator och stigar (OpenStreetMap)',
     jNext: 'Nästa: {times}',
+    reset: 'Återställ',
+    close: 'Stäng',
     jHint: 'För musen över kartan för att se hur du tar dig dit.',
     jHintTouch: 'Tryck och håll på kartan för att se hur du tar dig dit.',
     jArrive: 'framme {t}',
