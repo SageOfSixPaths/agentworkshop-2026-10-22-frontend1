@@ -93,6 +93,15 @@ module.exports = {
       if (!r) return json(res, 404, { error: 'unknown route' });
       return json(res, 200, { type: 'Feature', properties: { name: r.name, mode: r.mode }, geometry: { type: 'MultiLineString', coordinates: r.lines } });
     }
+    if (p === 'tasks') {
+      try {
+        const body = fs.readFileSync(path.join(__dirname, 'tasks.json'), 'utf8');
+        res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store' });
+        return res.end(body);
+      } catch {
+        return json(res, 200, { updated: null, tasks: [] });
+      }
+    }
     if (p === 'meta') {
       const out = {};
       for (const t of DAY_TYPES) {
