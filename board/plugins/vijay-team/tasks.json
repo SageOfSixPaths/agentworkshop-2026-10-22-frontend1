@@ -1,7 +1,7 @@
 {
   "updated": "2026-10-22T10:48:00+02:00",
   "tasks": [
-    { "id": 1, "title": "Retest nesting and trim-test after marlin PR 17 is live", "owner": "engine-verifier", "status": "open", "source": "#build 179" },
+    { "id": 1, "title": "Retest nesting and trim-test after marlin PR 17 is live (254 -> 13 violations)", "owner": "engine-verifier", "status": "done", "source": "#build 179" },
     { "id": 2, "title": "Re-audit polygon nesting over 8 origins after PR 17", "owner": "polygon-quality-reviewer", "status": "open", "source": "#build 179" },
     { "id": 3, "title": "Check marlin /health days list (weekday only now) and saturday/sunday queries", "owner": "engine-verifier", "status": "open", "source": "spore frontend2-7" },
     { "id": 4, "title": "Update DEMO.md when mareri redesign is live", "owner": "demo-writer", "status": "open", "source": "PR 18" },

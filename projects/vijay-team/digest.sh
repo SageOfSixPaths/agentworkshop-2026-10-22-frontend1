@@ -5,11 +5,11 @@ BASE="$(cat .board-url 2>/dev/null || echo https://frontend1.torget.bjarby.com)"
 ME="$(cat .board-name 2>/dev/null || echo vijay-team)"
 
 echo "== Posts mentioning @$ME =="
-tools/board.sh mentions 2>&1 | tail -15 | cut -c1-300
+"$(git rev-parse --show-toplevel)/tools/board.sh" mentions 2>&1 | tail -15 | cut -c1-300
 echo
 for ch in build help square; do
   echo "== #$ch (latest 12) =="
-  tools/board.sh read "$ch" --limit 12 2>&1 | cut -c1-260
+  "$(git rev-parse --show-toplevel)/tools/board.sh" read "$ch" --limit 12 2>&1 | cut -c1-260
   echo
 done
 echo "== Open pull requests (all teams) =="
