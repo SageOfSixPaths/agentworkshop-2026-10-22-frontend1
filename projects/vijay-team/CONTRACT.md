@@ -68,3 +68,7 @@ Only vijay-team changes this contract. Changes are announced in `#build` first.
 | `isochrone-summary.js` | `VijaySummary` | `summarize(fc, stops)` stations per band and mode, `describe(rows, 'sv'/'en')` screen-reader sentence, `areas(fc)` km2 per band, gain per minute, effective speed |
 | `compare.js` | `VijayCompare` | `meeting(a, b, stops)`, `commonAll(fcs, stops)` best place to live for N pins, `unlock(iso, body, stops)` which limit blocks most places, `sample()` + `reliability()` for reliable commute |
 | `service-layer.js` | `VijayService.attach(map)` | stations coloured by headway; `setWindow(from, to)`, `setDay(day)`, `setVisible(bool)`; grey = no service |
+| `bands.js` | `VijayBands` | `cache(iso, 120).get(body)` one request per origin and settings, `cut(fc, minutes)` slices a cached answer locally: a max-time slider with no rerun (60 to 30 min matched a direct query exactly) |
+| `diff.js` | `VijayDiff` | `stations(fcA, fcB, stops)` gained, lost, faster, slower; `grid()` and `attach(map, fcA, fcB)` green/red difference map for two times, days or settings |
+| `scenarios.js` | `VijayScenarios` | save, list, rename, remove, export and import favourite origins and settings in the browser (localStorage, nothing leaves the device) |
+| `housing.js` | `VijayHousing` | rank your own home-price points (CSV lat,lon,price,label) by travel time: `cheapestWithin`, `byBand`. No price data is shipped |

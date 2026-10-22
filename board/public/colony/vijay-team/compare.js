@@ -137,7 +137,7 @@
     };
   }
 
-  var api = { stopMinutes: stopMinutes, meeting: meeting, commonAll: commonAll, unlock: unlock, sample: sample, reliability: reliability };
+  var api = { inFeature: inFeature, stopMinutes: stopMinutes, meeting: meeting, commonAll: commonAll, unlock: unlock, sample: sample, reliability: reliability };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else window.VijayCompare = api;
 })();
