@@ -105,6 +105,14 @@ const set = (fc, stops) => new Set(stops.filter((s) => C.stopMinutes(fc, s) !== 
     check(ok && next, 'leaving at lastStart works and one minute later does not');
   }
 
+  // fragility layer buckets on live data, and last way home past midnight
+  const F = require(dir + 'fragility-layer.js');
+  const frag = await (await fetch(BASE + '/t/vijay-team/fragility?day=weekday')).json();
+  const bk = frag.stops.map((r) => F.bucketOf(r).key);
+  check(frag.stops.length > 5000 && bk.every(Boolean) && bk.filter((k) => k === 'single').length === frag.singleLine, 'fragility buckets match the endpoint', `${frag.singleLine} single-line of ${frag.stations}`);
+  const lateHome = await L.find(iso, { ...base, maxTravelMinutes: 45 }, { home: { lat: 59.2, lon: 17.85 }, after: '23:00', latest: '26:00' });
+  check(lateHome.lastStart !== null && /^\d\d:\d\d$/.test(lateHome.lastStart), 'last way home can search past midnight', `${lateHome.lastStart}, ${lateHome.calls} calls`);
+
   console.log(fails ? fails + ' FAILED' : 'ALL PASS');
   process.exit(fails ? 1 : 0);
 })();

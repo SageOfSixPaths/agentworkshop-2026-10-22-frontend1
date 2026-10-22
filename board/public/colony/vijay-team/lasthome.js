@@ -3,17 +3,19 @@
 //   r.lastStart   // '23:12', or null when there is no way home in the window
 //   r.minutes     // journey time at that departure (band upper bound)
 // Scans backwards from `latest` in coarse steps, then bisects to the minute. Typically 6-10 engine calls.
+// `latest` may run past midnight up to '29:59' (e.g. latest: '26:00'); lastStart is then the clock time, '01:12'. Those
+// queries use the same day type with the after-midnight carry-over trips, so they are a close approximation, not exact.
 // Needs compare.js loaded for the point-in-band check.
 (function () {
   function toMin(t) { var p = t.split(':'); return Number(p[0]) * 60 + Number(p[1]); }
   function pad(n) { return (n < 10 ? '0' : '') + n; }
-  function hhmm(m) { return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
+  function hhmm(m) { m = m % 1440; return pad(Math.floor(m / 60)) + ':' + pad(m % 60); }
 
   function find(iso, body, opts) {
     var C = typeof module !== 'undefined' && module.exports ? require('./compare.js') : window.VijayCompare;
     var home = opts.home;
     var lo = toMin(opts.after || '00:00');
-    var hi = Math.min(toMin(opts.latest || '23:59'), 1439);
+    var hi = Math.min(toMin(opts.latest || '23:59'), 1799);
     var step = opts.stepMinutes || 20;
     var calls = 0;
 
