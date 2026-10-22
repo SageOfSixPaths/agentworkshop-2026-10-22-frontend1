@@ -1,10 +1,10 @@
 # Demo checklist: Isochronous Public Transport Map for Stockholm
 
-Status checked live on 2026-10-22 10:20. Re-check before the demo. Owner in brackets.
+Status checked live on 2026-10-22 10:26. Re-check before the demo. Owner in brackets.
 
 | Requirement | Status | Evidence |
 |---|---|---|
-| Map of Stockholm with OSM tiles, pan and zoom | Missing | mareri tile `/colony/mareri/` is 404; filbac tile has only the settings panel, no map yet. Our own station explorer map exists (vijay-team) but it is not the product (mareri, filbac) |
+| Map of Stockholm with OSM tiles, pan and zoom | Partly | filbac tile `/colony/filbac/` is live with a Leaflet map; mareri tile `/colony/mareri/` is still 404. Our own station explorer map exists (vijay-team) but it is not the product (mareri, filbac) |
 | Origin pin, movable | Missing | no live tile with a pin yet (mareri, filbac) |
 | Start time, default now | Partly | settings panel has start time, default null (filbac) |
 | Max travel time 5 to 120 step 5, default 30 | Partly | in the settings panel (filbac); engine accepts 5..120 but also accepted 33 (marlin, fault reported by tomfor) |
@@ -13,8 +13,8 @@ Status checked live on 2026-10-22 10:20. Re-check before the demo. Owner in brac
 | Transport types | Partly | mode names agreed (vijay-team); selection in UI not verified |
 | Max connections, default 3 | Done (UI) | settings panel (filbac) |
 | Update button triggers calculation | Missing | no live end-to-end path yet |
-| 5-minute colour bands | Partly | engine returns bands on fixture data (marlin); no map overlay live yet |
-| Results within a couple of seconds | Unknown | engine answers in about 26 ms on the 39-stop fixture; real data untested (marlin, perf-analyst) |
+| 5-minute colour bands | Partly | engine returns bands on real data in 13 to 330 ms (marlin); overlay on the map not yet verified |
+| Results within a couple of seconds | Unknown | real data: 13 to 330 ms per query, 120 min answer is 1.09 MB gzipped (marlin, perf-analyst) |
 | Trafiklab not called per request | Done | all data is preprocessed from the GTFS zip, no Trafiklab call at request time (vijay-team) |
 | Mobile and desktop usable | Unknown | no live product tile to test (mobile-ux-tester) |
 | Clean modern UI | Unknown | same |
@@ -23,8 +23,8 @@ Status checked live on 2026-10-22 10:20. Re-check before the demo. Owner in brac
 
 ## Biggest blockers right now
 
-1. **marlin runs on a 39-stop fixture** (`/t/marlin/health` says `source: fixture`). Our real data has been live since 10:08.
-2. **No live map app.** mareri and filbac both claimed it; mareri's tile is 404.
+1. ~~marlin on fixture~~ Fixed: marlin runs on real GTFS (6038 stops, 644,804 connections). Open: T-Centralen 60 min polygon misses 3 far stops (93.9% coverage).
+2. **Map app not yet verified end to end.** filbac's tile is live; mareri's is 404. Test Update, bands and errors on filbac's tile.
 3. **Engine accepts `maxTravelMinutes: 33`** where the contract says multiples of 5 (found by tomfor).
 
 ## Demo script (3 minutes), once the map app is live
