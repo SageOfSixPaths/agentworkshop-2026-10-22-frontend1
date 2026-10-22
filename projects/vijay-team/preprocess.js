@@ -161,7 +161,7 @@ const ymd = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
           const dLat = (o.lat - s.lat) * 111320;
           const dLon = (o.lon - s.lon) * 111320 * Math.cos(s.lat * rad);
           const dist = Math.hypot(dLat, dLon);
-          if (dist <= 300) addWalk(i, j, Math.round(dist / 1.3));
+          if (dist <= 300) addWalk(i, j, Math.max(30, Math.round(dist / 1.3)));
         }
       }
     }
@@ -192,6 +192,35 @@ const ymd = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
     };
     const file = path.join(out, `network-${type}.json.gz`);
     fs.writeFileSync(file, zlib.gzipSync(JSON.stringify(net), { level: 9 }));
+
+    // Connections: one per consecutive stop pair, grouped by departure stop and sorted by dep time.
+    const routeNames = [];
+    const routeIdx = new Map();
+    const conns = [];
+    trips.forEach((t, ti) => {
+      const rk = t.mode + ':' + t.route;
+      if (!routeIdx.has(rk)) { routeIdx.set(rk, routeNames.length); routeNames.push({ name: t.route, mode: t.mode }); }
+      const r = routeIdx.get(rk);
+      for (let i = 0; i < t.stops.length - 1; i++) {
+        conns.push([t.stops[i], t.stops[i + 1], t.times[i], t.times[i + 1], r, ti]);
+      }
+    });
+    conns.sort((a, b) => a[0] - b[0] || a[2] - b[2]);
+    const offsets = new Array(stations.length + 1).fill(0);
+    for (const c of conns) offsets[c[0] + 1]++;
+    for (let i = 0; i < stations.length; i++) offsets[i + 1] += offsets[i];
+    const col = (k) => conns.map((c) => c[k]);
+    const cfile = path.join(out, `connections-${type}.json.gz`);
+    fs.writeFileSync(cfile, zlib.gzipSync(JSON.stringify({
+      version: 1,
+      dayType: type,
+      date: servicesFor[type].date,
+      stopCount: stations.length,
+      routes: routeNames,
+      offsets,
+      from: col(0), to: col(1), dep: col(2), arr: col(3), route: col(4), trip: col(5),
+    }), { level: 9 }));
+    console.log(type, 'connections', conns.length, (fs.statSync(cfile).size / 1e6).toFixed(1) + ' MB');
     console.log(type, servicesFor[type].date, 'trips', trips.length, 'stops', stations.length, 'transfers', transfers.length, (fs.statSync(file).size / 1e6).toFixed(1) + ' MB');
   }
 })();
