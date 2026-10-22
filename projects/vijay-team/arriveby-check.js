@@ -56,7 +56,7 @@ const check = (ok, name, detail) => { console.log((ok ? 'ok   ' : 'FAIL ') + nam
 
   const bad = await iso(body({ origin: origins[0][1], startTime: '09:00', arriveBy: 'yes', maxTravelMinutes: 30 }));
   check(bad.status === 400 || bad.status === 200, 'arriveBy as a string does not crash', String(bad.status));
-  const sea = await iso(body({ origin: { lat: 59.3, lon: 18.5 }, startTime: '09:00', arriveBy: true, maxTravelMinutes: 30 }));
+  const sea = await iso(body({ origin: { lat: 59.0, lon: 19.5 }, startTime: '09:00', arriveBy: true, maxTravelMinutes: 30 }));
   check(sea.status === 422, 'pin in the sea gives 422', String(sea.status));
   console.log(fails ? fails + ' FAILED' : 'ALL PASS');
   process.exit(fails ? 1 : 0);
