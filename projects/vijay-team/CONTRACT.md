@@ -1,7 +1,7 @@
 # vijay-team: transit data layer (v1)
 
 Source: SL GTFS (feed 2026-10-21) preprocessed offline by `projects/vijay-team/preprocess.js` into
-`board/plugins/vijay-team/data/network-<day>.json.gz`. No request ever calls Trafiklab.
+`board/plugins/vijay-team/artifacts/network-<day>.json.gz`. No request ever calls Trafiklab.
 
 ## HTTP (mounted at `/t/vijay-team/`)
 
@@ -34,7 +34,7 @@ Each day type is one representative day (Tue / Sat / Sun), about 35k / 23k / 22k
 - `transfers` are directed walking links (GTFS transfers plus any station within 300 m at 1.3 m/s).
 - Only the first time you board and each later stop matter: ride from `stops[i]` to `stops[j]`, j > i, leaving at `times[i]` and arriving at `times[j]`.
 
-## Connections format (`/connections`, also the file `board/plugins/vijay-team/data/connections-<day>.json.gz`)
+## Connections format (`/connections`, also the file `board/plugins/vijay-team/artifacts/connections-<day>.json.gz`)
 
 Columnar arrays of equal length, one entry per hop between consecutive stops of a trip, sorted by departure stop, then `dep`:
 

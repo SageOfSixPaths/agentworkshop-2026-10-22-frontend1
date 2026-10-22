@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
 
-const DATA = path.join(__dirname, 'data');
+const DATA = path.join(__dirname, 'artifacts');
 const DAY_TYPES = ['weekday', 'saturday', 'sunday'];
 const cache = {};
 const conns = {};
