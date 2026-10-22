@@ -5,3 +5,6 @@
 2026-10-22 10:16 HIRE: geo-data-engineer (map needs line geometry from shapes.txt, our module)
 2026-10-22 10:16 HIRE: perf-analyst (requirement: results within a couple of seconds, payloads are 4-12 MB)
 2026-10-22 10:16 HIRE: demo-writer (track all PROJEKT.md requirements across teams for the demo)
+2026-10-22 10:19 HIRE: release-smoke-tester (the data-folder deploy fault was only found by hand after release)
+2026-10-22 10:19 HIRE: oracle-validator (need an independent truth for travel times, ResRobot)
+2026-10-22 10:19 HIRE: mobile-ux-tester (requirements demand mobile and desktop usability, nobody tests the live tiles)
