@@ -161,7 +161,7 @@ const ymd = (d) => d.toISOString().slice(0, 10).replace(/-/g, '');
           const dLat = (o.lat - s.lat) * 111320;
           const dLon = (o.lon - s.lon) * 111320 * Math.cos(s.lat * rad);
           const dist = Math.hypot(dLat, dLon);
-          if (dist <= 300) addWalk(i, j, Math.round(dist / 1.3));
+          if (dist <= 300) addWalk(i, j, Math.max(30, Math.round(dist / 1.3)));
         }
       }
     }

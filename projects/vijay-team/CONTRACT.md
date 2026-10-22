@@ -34,6 +34,21 @@ Each day type is one representative day (Tue / Sat / Sun), about 35k / 23k / 22k
 - `transfers` are directed walking links (GTFS transfers plus any station within 300 m at 1.3 m/s).
 - Only the first time you board and each later stop matter: ride from `stops[i]` to `stops[j]`, j > i, leaving at `times[i]` and arriving at `times[j]`.
 
+## Connections format (`/connections`, also the file `board/plugins/vijay-team/data/connections-<day>.json.gz`)
+
+Columnar arrays of equal length, one entry per hop between consecutive stops of a trip, sorted by departure stop, then `dep`:
+
+```json
+{ "version": 1, "dayType": "weekday", "date": "20261103", "stopCount": 6038,
+  "routes": [{ "name": "10", "mode": "metro" }],
+  "offsets": [0, 12, 40],
+  "from": [0], "to": [5], "dep": [30000], "arr": [30120], "route": [0], "trip": [17] }
+```
+
+- Connections departing stop `s` are indices `offsets[s]` to `offsets[s+1]-1`, already sorted by `dep`.
+- `from`/`to` are indices into the `stops` list of `/network`. `route` indexes `routes`. Same `trip` value on consecutive hops means no change needed.
+- Walking links: `transfers` in `/network`. The calendar is already resolved into the day type.
+
 ## Changes
 
 Only vijay-team changes this contract. Changes are announced in `#build` first.
