@@ -335,7 +335,8 @@
         egressMinutes: intVal('walk-dest'),
         transferMinutes: intVal('walk-transfer')
       },
-      bandMinutes: 5
+      bandMinutes: 5,
+      arriveBy: $('arrive-by').checked
     };
   }
 
@@ -391,6 +392,7 @@
     try {
       try {
         if (!body.modes.length) return await postEngine(WALK_ENGINE_URL, body, ctrl);
+        if (body.arriveBy) return await postEngine(FALLBACK_ENGINE_URL, body, ctrl); // reverse search lives in marlin
         return await postEngine(ENGINE_URL, body, ctrl);
       } catch (e) {
         if (e.name === 'AbortError' || !streetEngineDown(e)) throw e;
@@ -440,6 +442,32 @@
     return el;
   }
 
+  // Later departures of the same line from the boarding stop (vijay-team /departures; stop indices match marlin's).
+  var depCache = {};
+  function stockholmDayType() {
+    var start = journeyBody && journeyBody.startTime ? new Date(journeyBody.startTime) : new Date();
+    var wd = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Stockholm', weekday: 'short' }).format(start);
+    return wd === 'Sat' ? 'saturday' : wd === 'Sun' ? 'sunday' : 'weekday';
+  }
+  function loadNextDepartures(leg, el) {
+    if (typeof leg.from.stop !== 'number' || !leg.line) return;
+    var url = '/t/vijay-team/departures?stop=' + leg.from.stop + '&time=' + leg.depart +
+      '&day=' + stockholmDayType() + '&limit=50&modes=' + encodeURIComponent(leg.mode);
+    if (!depCache[url]) {
+      depCache[url] = fetch(url).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; });
+    }
+    depCache[url].then(function (data) {
+      if (!data || !data.departures) return;
+      var own = data.departures.filter(function (x) { return x.route === leg.line && x.dep === leg.depart; })[0];
+      if (!own) return;
+      var times = data.departures.filter(function (x) { return x.route === leg.line && x.toIndex === own.toIndex && x.dep > leg.depart; })
+        .slice(0, 3).map(function (x) { return x.dep; });
+      if (!times.length) return;
+      el.textContent = t('jNext', { times: times.join(', ') });
+      el.hidden = false;
+    });
+  }
+
   function journeyContent(d) {
     var box = journeyEl('div', 'j-card');
     var head = journeyEl('div', 'j-head');
@@ -447,6 +475,7 @@
     var changes = d.transfers === 0 ? t('jDirect') : d.transfers === 1 ? t('jChange1') : t('jChanges', { n: d.transfers });
     head.appendChild(journeyEl('span', 'j-sub', t('jArrive', { t: d.arriveTime }) + ' · ' + changes));
     box.appendChild(head);
+    var firstRide = false;
     d.legs.forEach(function (leg, i) {
       var row = journeyEl('div', 'j-row ' + leg.type);
       if (leg.type === 'walk') {
@@ -467,6 +496,13 @@
         var meta = leg.depart + '\u2013' + leg.arrive + ' \u00B7 ' + t(leg.stops === 1 ? 'jStop1' : 'jStops', { n: leg.stops });
         if (leg.waitMinutes > 0) meta += ' \u00B7 ' + t('jWait', { n: leg.waitMinutes });
         rt.appendChild(journeyEl('div', 'j-meta', meta));
+        if (!firstRide) {
+          firstRide = true;
+          var next = journeyEl('div', 'j-meta j-next', '');
+          next.hidden = true;
+          rt.appendChild(next);
+          loadNextDepartures(leg, next);
+        }
         row.appendChild(rt);
       }
       box.appendChild(row);
@@ -696,9 +732,9 @@
       } else {
         setStatus(t('done', { s: ((performance.now() - started) / 1000).toFixed(1) }));
         speakSummary(fc);
-        setJourneyBody(fc && fc.meta && fc.meta.walkingModel === 'street' ? body : null);
+        setJourneyBody(fc && fc.meta && fc.meta.walkingModel === 'street' && !body.arriveBy ? body : null);
         if (fc && fc.meta && fc.meta.walkingModel === 'street') markStreetWalk();
-        else if (!(fc && fc.meta && fc.meta.walkOnly)) loadWalkArea(pin.getLatLng(), body.walking.accessMinutes);
+        else if (!(fc && fc.meta && fc.meta.walkOnly) && !body.arriveBy) loadWalkArea(pin.getLatLng(), body.walking.accessMinutes);
         if (window.matchMedia('(max-width: 700px)').matches) {
           panel.classList.add('collapsed');
           toggle.setAttribute('aria-expanded', 'false');
@@ -729,6 +765,7 @@
     var h = new URLSearchParams();
     h.set('ll', p.lat.toFixed(5) + ',' + p.lng.toFixed(5));
     Object.keys(HASH_FIELDS).forEach(function (k) { h.set(k, $(HASH_FIELDS[k]).value); });
+    h.set('a', $('arrive-by').checked ? '1' : '0');
     h.set('m', Array.prototype.slice.call(modesBox.querySelectorAll('input:checked'))
       .map(function (cb) { return cb.value; }).join(','));
     history.replaceState(null, '', '#' + h.toString());
@@ -749,6 +786,7 @@
       var on = h.get('m').split(',');
       modesBox.querySelectorAll('input').forEach(function (cb) { cb.checked = on.indexOf(cb.value) !== -1; });
     }
+    $('arrive-by').checked = h.get('a') === '1';
     syncTravel();
     return true;
   }
