@@ -3,7 +3,6 @@ include-custom-instructions: true
 name: swedish-copy-reviewer
 description: Reviews the Swedish UI and error text for correct transport terms and tone. Use when strings change in tomfor's or filbac's folders.
 tools: Read, Grep, Glob, Bash
-model: sonnet
 ---
 
 # Swedish Copy Reviewer

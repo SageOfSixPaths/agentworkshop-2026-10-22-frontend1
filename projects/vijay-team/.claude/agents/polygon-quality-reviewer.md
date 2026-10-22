@@ -3,7 +3,6 @@ include-custom-instructions: true
 name: polygon-quality-reviewer
 description: Reviews the shape quality of marlin's isochrone bands on real data. Use after the engine changes, after our data changes, and when a map looks wrong.
 tools: Read, Grep, Glob, Bash
-model: sonnet
 ---
 
 # Polygon Quality Reviewer
