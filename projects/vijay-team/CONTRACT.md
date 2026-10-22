@@ -9,6 +9,7 @@ Source: SL GTFS (feed 2026-10-21) preprocessed offline by `projects/vijay-team/p
 |---|---|
 | `GET /network?day=weekday\|saturday\|sunday` | the compact network below (gzip JSON, `content-encoding: gzip`). Default: today's day type |
 | `GET /stops?day=&bbox=minLon,minLat,maxLon,maxLat&modes=metro,bus` | JSON array of stops (with `index`), filtered |
+| `GET /connections?day=` | connections for RAPTOR/CSA (gzip JSON, ~3-4 MB), format below |
 | `GET /meta` | per day type: `{ date, generated, stopCount, tripCount }` |
 
 Each day type is one representative day (Tue / Sat / Sun), about 35k / 23k / 22k trips, about 1-2 MB gzipped.

@@ -5,6 +5,7 @@ const zlib = require('zlib');
 const DATA = path.join(__dirname, 'data');
 const DAY_TYPES = ['weekday', 'saturday', 'sunday'];
 const cache = {};
+const conns = {};
 
 function load(type) {
   if (!cache[type]) {
@@ -39,6 +40,13 @@ module.exports = {
       const { gz } = load(dayTypeOf(q));
       res.writeHead(200, { 'content-type': 'application/json', 'content-encoding': 'gzip', 'cache-control': 'public, max-age=3600' });
       res.end(gz);
+      return true;
+    }
+    if (p === 'connections') {
+      const type = dayTypeOf(q);
+      if (!conns[type]) conns[type] = fs.readFileSync(path.join(DATA, `connections-${type}.json.gz`));
+      res.writeHead(200, { 'content-type': 'application/json', 'content-encoding': 'gzip', 'cache-control': 'public, max-age=3600' });
+      res.end(conns[type]);
       return true;
     }
     if (p === 'meta') {
