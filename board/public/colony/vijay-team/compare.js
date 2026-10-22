@@ -105,6 +105,36 @@
     });
   }
 
+  // Return trip: places you can reach going out AND get back from before a deadline. Two engine calls (forward from `start`,
+  // arrive-by at `returnBy`), intersected by station. `stranded` = reachable going out but no way back in time; `tooTight` =
+  // both directions exist but out + back + stayMinutes does not fit in the window (times are band upper bounds, so conservative).
+  //   VijayCompare.roundTrip(iso, body, stops, { start: '21:00', returnBy: '23:30' })
+  function roundTrip(iso, body, stops, opts) {
+    var o = opts || {};
+    var toMin = function (t) { var p = t.split(':'); return Number(p[0]) * 60 + Number(p[1]); };
+    var window = (toMin(o.returnBy) - toMin(o.start) + 1440) % 1440;
+    var stay = o.stayMinutes || 0;
+    var out = Object.assign({}, body, { startTime: o.start });
+    var back = Object.assign({}, body, { startTime: o.returnBy, arriveBy: true });
+    return Promise.all([iso(out), iso(back)]).then(function (res) {
+      var both = [];
+      var stranded = [];
+      var tooTight = [];
+      stops.forEach(function (s) {
+        var a = stopMinutes(res[0], s);
+        if (a === null) return;
+        var b = stopMinutes(res[1], s);
+        var row = { index: s.index, name: s.name, lat: s.lat, lon: s.lon, minutesOut: a, minutesBack: b };
+        if (b === null) stranded.push(row);
+        else if (a + b + stay > window) tooTight.push(row);
+        else both.push(row);
+      });
+      both.sort(function (x, y) { return x.minutesOut + x.minutesBack - (y.minutesOut + y.minutesBack); });
+      var total = both.length + stranded.length + tooTight.length;
+      return { both: both, stranded: stranded, tooTight: tooTight, outbound: total, windowMinutes: window, canReturnShare: both.length / Math.max(total, 1) };
+    });
+  }
+
   function hhmmAdd(start, minutes) {
     var p = start.split(':');
     var t = (Number(p[0]) * 60 + Number(p[1]) + minutes) % 1440;
@@ -137,7 +167,7 @@
     };
   }
 
-  var api = { inFeature: inFeature, stopMinutes: stopMinutes, meeting: meeting, commonAll: commonAll, unlock: unlock, sample: sample, reliability: reliability };
+  var api = { roundTrip: roundTrip, inFeature: inFeature, stopMinutes: stopMinutes, meeting: meeting, commonAll: commonAll, unlock: unlock, sample: sample, reliability: reliability };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else window.VijayCompare = api;
 })();

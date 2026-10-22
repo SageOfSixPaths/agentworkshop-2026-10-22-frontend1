@@ -44,6 +44,12 @@ const set = (fc, stops) => new Set(stops.filter((s) => C.stopMinutes(fc, s) !== 
   check(ds.lost.length + ds.slower.length > 0, 'Sunday is worse than weekday morning', `lost ${ds.lost.length}, slower ${ds.slower.length}`);
   check(Diff.stations(morning, morning, stops).lost.length === 0 && Diff.grid(morning, morning).cells.length === 0, 'identical answers give an empty diff');
 
+  // round trip: a stay shrinks the workable set, and every listed place fits the window
+  const rt0 = await C.roundTrip(iso, { ...base, maxTravelMinutes: 60 }, stops, { start: '17:00', returnBy: '19:00' });
+  const rt30 = await C.roundTrip(iso, { ...base, maxTravelMinutes: 60 }, stops, { start: '17:00', returnBy: '19:00', stayMinutes: 30 });
+  check(rt0.both.length > rt30.both.length && rt30.tooTight.length > 0, 'round trip: a 30 min stay removes places', `${rt0.both.length} -> ${rt30.both.length}`);
+  check(rt30.both.every((r) => r.minutesOut + r.minutesBack + 30 <= rt30.windowMinutes), 'round trip: every listed place fits out + stay + back in the window');
+
   // scenarios
   const s = Scen.save('Home to work', { origin: base.origin, body: base, note: 'test' });
   check(Scen.list().length === 1 && Scen.get(s.id).name === 'Home to work', 'scenario saved and listed');
