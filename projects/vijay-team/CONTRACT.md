@@ -70,5 +70,8 @@ Only vijay-team changes this contract. Changes are announced in `#build` first.
 | `service-layer.js` | `VijayService.attach(map)` | stations coloured by headway; `setWindow(from, to)`, `setDay(day)`, `setVisible(bool)`; grey = no service |
 | `bands.js` | `VijayBands` | `cache(iso, 120).get(body)` one request per origin and settings, `cut(fc, minutes)` slices a cached answer locally: a max-time slider with no rerun (60 to 30 min matched a direct query exactly) |
 | `diff.js` | `VijayDiff` | `stations(fcA, fcB, stops)` gained, lost, faster, slower; `grid()` and `attach(map, fcA, fcB)` green/red difference map for two times, days or settings |
+| `timelapse.js` | `VijayTimelapse` | `frames(iso, body, {from, to, stepMinutes})` one answer per time of day (3 engine calls at a time), `play(frames, draw, {fps})` animation, `series(frames, stops)` station count per time |
+| `lasthome.js` | `VijayLastHome` | `find(iso, body, {home, after, latest})` latest departure that still reaches `home` within the time limit (`lastStart`, `minutes`), about 6-10 engine calls |
+| `permalink.js` | `VijayPermalink` | `encode/decode/url/fromLocation` shareable search links (validated, unknown values dropped), `geojson(fc)`, `stationsCSV(fc, stops)`, `download()` |
 | `scenarios.js` | `VijayScenarios` | save, list, rename, remove, export and import favourite origins and settings in the browser (localStorage, nothing leaves the device) |
 | `housing.js` | `VijayHousing` | rank your own home-price points (CSV lat,lon,price,label) by travel time: `cheapestWithin`, `byBand`. No price data is shipped |

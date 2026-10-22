@@ -74,6 +74,37 @@ const set = (fc, stops) => new Set(stops.filter((s) => C.stopMinutes(fc, s) !== 
   try { Hous.fromCSV('a,b\n1,2'); } catch (e) { bad = true; }
   check(bad, 'CSV without lat/lon/price is rejected');
 
+  // permalink: round trip, validation, exports
+  const P = require(dir + 'permalink.js');
+  const dec = P.decode(P.url('https://x/y', { ...base, arriveBy: true }).split('#')[1]);
+  check(dec && dec.origin.lat === 59.3303 && dec.startTime === '08:00' && dec.maxTravelMinutes === 30 && dec.arriveBy === true && dec.walking.accessMinutes === 10 && dec.modes.length === 6, 'permalink round trip keeps the search');
+  check(P.decode('o=999,18') === null && P.decode('') === null, 'permalink rejects a missing or invalid origin');
+  const hostile = P.decode('o=59.3,18.0&m=99999&modes=bus,<script>&a=1,2');
+  check(hostile.maxTravelMinutes === undefined && hostile.walking === undefined && hostile.modes.join() === 'bus', 'permalink drops out-of-range and unknown values');
+  const pcsv = P.stationsCSV(morning, stops).split('\n');
+  check(pcsv.length > 100 && pcsv[0] === 'name,lat,lon,minutes', 'stations CSV export', `${pcsv.length - 1} rows`);
+
+  // timelapse: frames over the day, area changes
+  const T = require(dir + 'timelapse.js');
+  check(T.times('05:00', '07:00', 30).join() === '05:00,05:30,06:00,06:30,07:00', 'timelapse time steps');
+  const tl = await T.frames(iso, { ...base, maxTravelMinutes: 20 }, { from: '05:00', to: '23:00', stepMinutes: 120 });
+  const ser = T.series(tl, stops);
+  check(tl.length === 10 && tl.every((f, i) => f && f.time === T.times('05:00', '23:00', 120)[i]), 'timelapse frames come back in order', ser.map((x) => x.time + ':' + x.stations).join(' '));
+  check(Math.max(...ser.map((x) => x.stations)) > Math.min(...ser.map((x) => x.stations)), 'reachable area varies through the day');
+
+  // last way home: T-Centralen to Kista-ish point, result must verify
+  const L = require(dir + 'lasthome.js');
+  const home = { lat: 59.4032, lon: 17.9444 };
+  const lh = await L.find(iso, { ...base, maxTravelMinutes: 60 }, { home, after: '18:00', latest: '23:59' });
+  check(lh.lastStart !== null, 'last way home found', `${lh.lastStart}, ${lh.minutes} min, ${lh.calls} calls`);
+  if (lh.lastStart) {
+    const [h, m] = lh.lastStart.split(':').map(Number);
+    const later = `${String(Math.floor((h * 60 + m + 1) / 60)).padStart(2, '0')}:${String((h * 60 + m + 1) % 60).padStart(2, '0')}`;
+    const ok = C.stopMinutes(await iso({ ...base, maxTravelMinutes: 60, startTime: lh.lastStart }), home) !== null;
+    const next = (h * 60 + m + 1) > 1439 || C.stopMinutes(await iso({ ...base, maxTravelMinutes: 60, startTime: later }), home) === null;
+    check(ok && next, 'leaving at lastStart works and one minute later does not');
+  }
+
   console.log(fails ? fails + ' FAILED' : 'ALL PASS');
   process.exit(fails ? 1 : 0);
 })();
